@@ -28,7 +28,8 @@ export function TimeSeriesChart({
   showConfidence = true 
 }: TimeSeriesChartProps) {
   const chartData = useMemo(() => {
-    const result = data.map((point, index) => ({
+    type ChartItem = { date: string; value: number; index?: number; isForecast?: boolean; upper?: number; lower?: number };
+    const result: ChartItem[] = data.map((point, index) => ({
       date: point.date,
       value: point.value,
       index
@@ -42,14 +43,13 @@ export function TimeSeriesChart({
         const dateOffset = i + 1;
         const futureDate = `+${dateOffset}`;
         
-        const item: { date: string; value: number; isForecast?: boolean; upper?: number; lower?: number } = {
+        result.push({
           date: futureDate,
           value: forecast.predictions[i],
-          isForecast: true,
+          index: lastIndex + i,
           upper: showConfidence ? forecast.upper_bound[i] : undefined,
           lower: showConfidence ? forecast.lower_bound[i] : undefined
-        };
-        result.push(item);
+        });
       }
     }
     
@@ -107,7 +107,7 @@ export function TimeSeriesChart({
             fontSize: '12px'
           }}
           labelStyle={{ color: '#a1a1aa', marginBottom: '4px' }}
-          formatter={(value: number) => [formatValue(value), '']}
+          formatter={(value) => [formatValue(Number(value)), '']}
         />
         {showConfidence && forecast && (
           <Area
