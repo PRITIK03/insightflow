@@ -12,7 +12,7 @@ export interface SalesRecord {
 }
 
 export interface ForecastResult {
-  model: 'exponential-smoothing' | 'linear-regression' | 'moving-average' | 'ensemble';
+  model: ModelType;
   predictions: number[];
   lower_bound: number[];
   upper_bound: number[];
@@ -20,8 +20,12 @@ export interface ForecastResult {
     rmse: number;
     mae: number;
     mape: number;
+    r2?: number;
   };
   importance?: FeatureImportance[];
+  trainingSize?: number;
+  crossValidationScores?: number[];
+  parameters?: Record<string, number>;
 }
 
 export interface FeatureImportance {
