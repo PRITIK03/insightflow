@@ -57,10 +57,30 @@ export interface Metrics {
   growthRate: number;
 }
 
-export type ModelType = 'exponential-smoothing' | 'linear-regression' | 'moving-average' | 'ensemble';
+export type ModelType = 'exponential-smoothing' | 'linear-regression' | 'moving-average' | 'ensemble' | 'arima' | 'prophet';
 
 export interface ForecastConfig {
   model: ModelType;
   periods: number;
   confidence: number;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
+  stats?: {
+    count: number;
+    mean: number;
+    min: number;
+    max: number;
+    variance: number;
+  };
+}
+
+export interface DataSeries {
+  id: string;
+  name: string;
+  data: DataPoint[];
+  color?: string;
 }
