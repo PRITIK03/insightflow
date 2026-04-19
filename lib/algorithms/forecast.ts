@@ -2,6 +2,7 @@ import { ForecastResult, ForecastConfig, DataPoint } from '@/types';
 import { exponentialSmoothing } from './exponential-smoothing';
 import { linearRegression } from './linear-regression';
 import { movingAverage } from './moving-average';
+import { arima, crossValidate } from './arima';
 
 export function runForecast(
   data: DataPoint[],
@@ -16,10 +17,28 @@ export function runForecast(
       return linearRegression(values, config.periods, config.confidence);
     case 'moving-average':
       return movingAverage(values, config.periods, config.confidence);
+    case 'arima':
+      return arima(values, config.periods, config.confidence);
     case 'ensemble':
       return ensembleForecast(values, config);
     default:
       return exponentialSmoothing(values, config.periods, config.confidence);
+  }
+}
+
+export function runCrossValidation(
+  data: DataPoint[],
+  config: ForecastConfig
+): number[] {
+  const values = data.map(d => d.value);
+  
+  switch (config.model) {
+    case 'arima':
+      return crossValidate(values, { periods: config.periods, confidence: config.confidence });
+    case 'exponential-smoothing':
+      return crossValidate(values, { periods: config.periods, confidence: config.confidence });
+    default:
+      return crossValidate(values, { periods: config.periods, confidence: config.confidence });
   }
 }
 
@@ -118,8 +137,11 @@ export function compareModels(
   const testConfig3 = { ...config, model: 'moving-average' as const };
   models.push(runForecast(data, testConfig3));
   
-  const testConfig4 = { ...config, model: 'ensemble' as const };
+  const testConfig4 = { ...config, model: 'arima' as const };
   models.push(runForecast(data, testConfig4));
+  
+  const testConfig5 = { ...config, model: 'ensemble' as const };
+  models.push(runForecast(data, testConfig5));
   
   return models;
 }

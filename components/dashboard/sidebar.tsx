@@ -8,6 +8,7 @@ import {
   HelpCircle,
   Sparkles
 } from 'lucide-react';
+import { DataImportExport } from '@/components/data/import-export';
 
 interface NavItem {
   icon: React.ElementType;
@@ -52,6 +53,10 @@ export function Sidebar() {
             </button>
           );
         })}
+
+        <div className="pt-4 mt-4 border-t border-zinc-800/50">
+          <DataImportExport />
+        </div>
       </nav>
       
       <div className="p-3 border-t border-zinc-800/50 space-y-1">
