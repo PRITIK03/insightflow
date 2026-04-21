@@ -13,6 +13,7 @@ import {
   ComposedChart
 } from 'recharts';
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 
 interface TimeSeriesChartProps {
   data: DataPoint[];
