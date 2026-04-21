@@ -70,23 +70,98 @@ export function ForecastPanel() {
   };
   
   return (
-    <Card className="space-y-4">
+    <Card className="space-y-4 relative overflow-hidden">
+      {/* Loading overlay */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm z-10 flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="text-center space-y-4">
+              <motion.div
+                className="w-16 h-16 mx-auto relative"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              >
+                <div className="absolute inset-0 border-4 border-indigo-500/20 rounded-full"></div>
+                <div className="absolute inset-0 border-4 border-transparent border-t-indigo-500 rounded-full"></div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <p className="text-sm text-zinc-300 font-medium">Analyzing data...</p>
+                <p className="text-xs text-zinc-500">Running {selectedModel.replace('-', ' ')} algorithm</p>
+              </motion.div>
+              <motion.div
+                className="flex justify-center space-x-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-2 h-2 bg-indigo-500 rounded-full"
+                    animate={{
+                      scale: [1, 1.5, 1],
+                      opacity: [0.5, 1, 0.5]
+                    }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      delay: i * 0.2
+                    }}
+                  />
+                ))}
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex items-center justify-between">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-500" />
-            Forecast Engine
-          </CardTitle>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <CardTitle className="flex items-center gap-2">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="w-4 h-4 text-indigo-500" />
+              </motion.div>
+              Forecast Engine
+            </CardTitle>
+          </motion.div>
         </CardHeader>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleGenerate}
-          disabled={isLoading}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          Generate
-        </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleGenerate}
+            disabled={isLoading}
+          >
+            <motion.div
+              animate={isLoading ? { rotate: 360 } : {}}
+              transition={{ duration: 1, repeat: isLoading ? Infinity : 0, ease: "linear" }}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+            </motion.div>
+            Generate
+          </Button>
+        </motion.div>
       </div>
       
       <div className="space-y-3">
