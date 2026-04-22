@@ -1,4 +1,5 @@
 import { ForecastResult } from '@/types';
+import { Matrix } from 'ml-matrix';
 
 interface RegressionResult {
   coefficients: number[];
@@ -122,104 +123,30 @@ function generateForecastFeatures(startIdx: number, periods: number): number[][]
 }
 
 function fitRegression(features: number[][], n: number): RegressionResult {
-  const k = features[0].length - 1;
-  const X: number[][] = features.map(row => row.slice(0, k + 1));
-  const y = features.map(row => row[0]);
-  
-  const Xt = transpose(X);
-  const XtX = multiply(Xt, X);
-  const XtXInv = invertMatrix(XtX);
-  const XtXInvXt = multiply(XtXInv, Xt);
-  const beta = multiply(XtXInvXt, y.map(val => [val]));
-  
+  const X = new Matrix(features);
+  const y = Matrix.columnVector(features.map(row => row[0]));
+
+  const Xt = X.transpose();
+  const XtX = Xt.mmul(X);
+  const XtXInv = XtX.inverse();
+  const XtXInvXt = XtXInv.mmul(Xt);
+  const beta = XtXInvXt.mmul(y);
+
   return {
-    coefficients: beta.slice(0, k).map(row => row[0]),
-    intercept: beta[k]?.[0] ?? 0
+    coefficients: beta.subMatrix(1, beta.rows - 1, 0, 0).to1DArray(),
+    intercept: beta.get(0, 0)
   };
-}
-
-function transpose(matrix: number[][]): number[][] {
-  const rows = matrix.length;
-  const cols = matrix[0]?.length ?? 0;
-  const result: number[][] = [];
-  
-  for (let j = 0; j < cols; j++) {
-    result.push(matrix.map(row => row[j]));
-  }
-  
-  return result;
-}
-
-function multiply(A: number[][], B: number[][]): number[][] {
-  const rowsA = A.length;
-  const colsA = A[0]?.length ?? 0;
-  const rowsB = B.length;
-  const colsB = B[0]?.length ?? 0;
-  
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimension mismatch');
-  }
-  
-  const result: number[][] = [];
-  
-  for (let i = 0; i < rowsA; i++) {
-    result.push([]);
-    for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += A[i][k] * B[k][j];
-      }
-      result[i].push(sum);
-    }
-  }
-  
-  return result;
-}
-
-function invertMatrix(matrix: number[][]): number[][] {
-  const n = matrix.length;
-  const augmented: number[][] = matrix.map((row, i) => [...row, ...Array(n).fill(0).map((_, j) => i === j ? 1 : 0)]);
-  
-  for (let i = 0; i < n; i++) {
-    let maxRow = i;
-    for (let k = i + 1; k < n; k++) {
-      if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
-        maxRow = k;
-      }
-    }
-    [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
-    
-    const pivot = augmented[i][i];
-    if (Math.abs(pivot) < 1e-10) {
-      return matrix.map(row => row.map(() => 0));
-    }
-    
-    for (let j = 0; j < 2 * n; j++) {
-      augmented[i][j] /= pivot;
-    }
-    
-    for (let k = 0; k < n; k++) {
-      if (k !== i) {
-        const factor = augmented[k][i];
-        for (let j = 0; j < 2 * n; j++) {
-          augmented[k][j] -= factor * augmented[i][j];
-        }
-      }
-    }
-  }
-  
-  return augmented.map(row => row.slice(n));
 }
 
 function varianceX(features: number[][]): number {
   const n = features.length;
   const k = features[0].length - 1;
   let sum = 0;
-  
+
   for (const row of features) {
     sum += Math.pow(row[1] - (n - 1) / 2, 2);
   }
-  
+
   return sum / n;
 }
 
@@ -246,7 +173,7 @@ function calculateMetrics(actual: number[], fitted: number[]): { rmse: number; m
   let maeSum = 0;
   let mapeSum = 0;
   let count = 0;
-  
+
   for (let i = 0; i < actual.length && i < fitted.length; i++) {
     rmseSum += Math.pow(actual[i] - fitted[i], 2);
     maeSum += Math.abs(actual[i] - fitted[i]);
@@ -255,7 +182,7 @@ function calculateMetrics(actual: number[], fitted: number[]): { rmse: number; m
     }
     count++;
   }
-  
+
   return {
     rmse: count > 0 ? Math.sqrt(rmseSum / count) : 0,
     mae: count > 0 ? maeSum / count : 0,
@@ -266,7 +193,7 @@ function calculateMetrics(actual: number[], fitted: number[]): { rmse: number; m
 function calculateFeatureImportance(coefficients: number[]): { feature: string; importance: number }[] {
   const names = ['t', 't²', 'sin(day)', 'cos(day)', 'sin(month)', 'cos(month)', 'lag7', 'ma7', 'ma30'];
   const total = coefficients.reduce((sum, c) => sum + Math.abs(c), 0);
-  
+
   return coefficients.slice(0, names.length).map((c, i) => ({
     feature: names[i] || `x${i}`,
     importance: total > 0 ? Math.abs(c) / total : 0
@@ -282,3 +209,4 @@ function createEmptyForecast(model: ForecastResult['model'], periods: number): F
     metrics: { rmse: 0, mae: 0, mape: 0 }
   };
 }
+
