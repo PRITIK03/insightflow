@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import React from 'react';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -323,7 +324,7 @@ export default function AnalyticsPage() {
                             }}
                             transition={{ duration: 0.4 }}
                           >
-                            <card.icon className="w-8 h-8 text-white" />
+{React.createElement(card.icon, { className: "w-8 h-8 text-white" })}
                           </motion.div>
                           <motion.div
                             className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border border-white/10 ${
@@ -401,72 +402,9 @@ export default function AnalyticsPage() {
                 </motion.div>
               ))
             )}
-          </motion.div>
-              ))
-            ) : (
-              [
-                {
-                  title: "Total Revenue",
-                  value: `$${metrics.total.toLocaleString()}`,
-                  change: metrics.growth,
-                  icon: DollarSign,
-                  color: "from-green-500 to-emerald-500"
-                },
-                {
-                  title: "Average Daily",
-                  value: `$${metrics.average.toFixed(0)}`,
-                  change: metrics.growth / 2,
-                  icon: TrendingUp,
-                  color: "from-blue-500 to-indigo-500"
-                },
-                {
-                  title: "Growth Rate",
-                  value: `${metrics.growth.toFixed(1)}%`,
-                  change: metrics.growth > 0 ? 5 : -2,
-                  icon: Activity,
-                  color: "from-purple-500 to-pink-500"
-                },
-                {
-                  title: "Data Points",
-                  value: data.length.toString(),
-                  change: 2.1,
-                  icon: BarChart3,
-                  color: "from-orange-500 to-red-500"
-                }
-              ].map((kpi, index) => (
-                <motion.div
-                  key={kpi.title}
-                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ delay: 0.5 + index * 0.1, type: "spring", stiffness: 100 }}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  className="group"
-                >
-                  <Card className="relative overflow-hidden bg-gradient-to-br from-zinc-900/80 to-zinc-800/60 backdrop-blur-xl border-zinc-700/50 hover:border-zinc-600/50 transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${kpi.color} p-3`}>
-                          <kpi.icon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          kpi.change >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                        }`}>
-                          {kpi.change >= 0 ? '+' : ''}{kpi.change.toFixed(1)}%
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-zinc-500 mb-1">{kpi.title}</p>
-                        <p className="text-2xl font-bold text-white">{kpi.value}</p>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))
-            )}
-          </motion.div>
+           </motion.div>
 
-          {/* Chart Type Selector */}
+           {/* Chart Type Selector */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
