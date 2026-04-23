@@ -401,7 +401,7 @@ export default function AnalyticsPage() {
                   </div>
                 </motion.div>
               ))
-            )}
+            }
            </motion.div>
 
            {/* Chart Type Selector */}
@@ -455,7 +455,7 @@ export default function AnalyticsPage() {
                   <div className="h-80">
                     {data.length === 0 || isLoading ? (
                       <ChartSkeleton />
-                    ) : (
+            ) :
                       <ResponsiveContainer width="100%" height="100%">
                         {selectedChart === 'area' && (
                           <AreaChart data={areaData}>
