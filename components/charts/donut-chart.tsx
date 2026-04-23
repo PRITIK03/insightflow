@@ -80,7 +80,7 @@ export function DonutChart({
           <Legend
             verticalAlign="bottom"
             height={36}
-            formatter={(value, entry: any) => (
+            formatter={(value, entry: { color: string }) => (
               <span style={{ color: entry.color }}>{value}</span>
             )}
           />

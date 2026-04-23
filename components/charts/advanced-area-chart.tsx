@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 interface AdvancedAreaChartProps {
   data: Array<{
-    [key: string]: any;
+    [key: string]: string | number;
   }>;
   xKey: string;
   yKey: string;
@@ -111,7 +111,7 @@ export function AdvancedAreaChart({
               boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)'
             }}
             labelStyle={{ color: '#9ca3af', marginBottom: '4px' }}
-            formatter={(value: any) => [value?.toLocaleString(), yKey]}
+            formatter={(value: string | number) => [value?.toLocaleString(), yKey]}
           />
 
           <Area
