@@ -14,6 +14,7 @@ import { GaugeChart } from '@/components/charts/gauge-chart';
 import { AdvancedAreaChart } from '@/components/charts/advanced-area-chart';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Users, ShoppingCart, Activity, BarChart3, PieChart as PieChartIcon, LineChart as LineChartIcon } from 'lucide-react';
+import { MicroChart } from '@/components/charts/micro-chart';
 
 interface ChartData {
   name: string;
@@ -221,12 +222,6 @@ export default function AnalyticsPage() {
         {/* Mesh gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-indigo-500/8 to-purple-500/8 mix-blend-overlay" />
       </div>
-        <motion.div
-          className="absolute bottom-10 left-10 w-64 h-64 bg-gradient-to-tl from-emerald-500/8 to-cyan-500/6 rounded-full blur-3xl"
-          animate={{ scale: [1.1, 0.9, 1.1], opacity: [0.2, 0.5, 0.2] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-         />
-
 
       <Sidebar />
 
@@ -307,123 +302,132 @@ export default function AnalyticsPage() {
                     rotateY: 2,
                     transition: { duration: 0.3 }
                   }}
-                  className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-[1px] transition-all duration-300 hover:shadow-2xl hover:${card.bgGlow}`}
+                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-br p-[1px] transition-all duration-300 hover:shadow-2xl"
+                  style={{ boxShadow: `0 0 30px -5px ${card.chartColor}40` }}
                 >
-                  <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${card.gradient} p-[1px] transition-all duration-300 hover:shadow-2xl hover:shadow-lg`}>
-                    <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 h-full">
-                      {/* Animated background gradient */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-10 group-hover:opacity-20 transition-opacity duration-300`} />
+                  <div className="relative bg-slate-900/95 backdrop-blur-xl rounded-2xl p-6 h-full">
+                    {/* Animated background gradient */}
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
+                    />
 
-                      {/* Content */}
-                      <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
+                    {/* Content */}
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <motion.div
+                          className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${card.gradient} p-3 shadow-lg group-hover:shadow-xl transition-shadow duration-300`}
+                          whileHover={{
+                            rotate: [0, -5, 5, 0],
+                            scale: 1.1
+                          }}
+                          transition={{ duration: 0.4 }}
+                        >
+                          {React.createElement(card.icon, { className: "w-8 h-8 text-white" })}
+                        </motion.div>
+                        <motion.div
+                          className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border border-white/10 ${
+                            card.change >= 0
+                              ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                              : 'bg-red-500/20 text-red-300 border-red-500/30'
+                          }`}
+                          animate={card.change >= 0 ? {
+                            scale: [1, 1.1, 1],
+                            boxShadow: [
+                              '0 0 0 0 rgba(16, 185, 129, 0.4)',
+                              '0 0 0 4px rgba(16, 185, 129, 0)',
+                              '0 0 0 0 rgba(16, 185, 129, 0.4)'
+                            ]
+                          } : {}}
+                          transition={{
+                            duration: 2,
+                            repeat: card.change >= 0 ? Infinity : 0,
+                            repeatDelay: 3
+                          }}
+                        >
+                          {card.change >= 0 ? '↗' : '↘'} {Math.abs(card.change).toFixed(1)}%
+                        </motion.div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm text-slate-400 font-medium">{card.title}</p>
+                          <p className="text-3xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-300 bg-clip-text text-transparent">
+                            {card.value}
+                          </p>
+                        </div>
+
+                        {/* Real micro graph */}
+                        <motion.div
+                          className="mt-4"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.7 + index * 0.1 }}
+                        >
+                          <MicroChart
+                            data={data}
+                            color={card.chartColor}
+                            height={35}
+                          />
+                        </motion.div>
+                      </div>
+
+                      {/* Animated particles */}
+                      <div className="absolute top-4 right-4 w-20 h-20 overflow-hidden pointer-events-none">
+                        {Array.from({ length: 4 }, (_, i) => (
                           <motion.div
-                            className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${card.gradient} p-3 shadow-lg group-hover:shadow-xl transition-shadow duration-300`}
-                            whileHover={{
-                              rotate: [0, -5, 5, 0],
-                              scale: 1.1
+                            key={i}
+                            className={`absolute w-1 h-1 rounded-full bg-gradient-to-r ${card.gradient}`}
+                            style={{
+                              top: `${15 + i * 20}%`,
+                              right: `${10 + i * 15}%`,
                             }}
-                            transition={{ duration: 0.4 }}
-                          >
-{React.createElement(card.icon, { className: "w-8 h-8 text-white" })}
-                          </motion.div>
-                          <motion.div
-                            className={`px-3 py-1 rounded-full text-xs font-bold backdrop-blur-sm border border-white/10 ${
-                              card.change >= 0
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                                : 'bg-red-500/20 text-red-300 border-red-500/30'
-                            }`}
-                            animate={card.change >= 0 ? {
-                              scale: [1, 1.1, 1],
-                              boxShadow: [
-                                '0 0 0 0 rgba(16, 185, 129, 0.4)',
-                                '0 0 0 4px rgba(16, 185, 129, 0)',
-                                '0 0 0 0 rgba(16, 185, 129, 0.4)'
-                              ]
-                            } : {}}
+                            animate={{
+                              y: [0, -15, 0],
+                              opacity: [0.3, 1, 0.3],
+                              scale: [0.5, 1.2, 0.5]
+                            }}
                             transition={{
-                              duration: 2,
-                              repeat: card.change >= 0 ? Infinity : 0,
-                              repeatDelay: 3
+                              duration: 3 + i * 0.5,
+                              repeat: Infinity,
+                              delay: i * 0.8
                             }}
-                          >
-                            {card.change >= 0 ? '↗' : '↘'} {Math.abs(card.change).toFixed(1)}%
-                          </motion.div>
-                        </div>
-
-                        <div className="space-y-3">
-                          <div>
-                            <p className="text-sm text-slate-400 font-medium">{card.title}</p>
-                            <p className="text-3xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-300 bg-clip-text text-transparent">
-                              {card.value}
-                            </p>
-
-
-                          {/* Real micro graph */}
-                          <motion.div
-                            className="mt-4"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.7 + index * 0.1 }}
-                          >
-                            <MicroChart
-                              data={data}
-                              color={card.chartColor}
-                              height={35}
-                            />
-                          </motion.div>
-                        </div>
-
-                        {/* Animated particles */}
-                        <div className="absolute top-4 right-4 w-20 h-20 overflow-hidden pointer-events-none">
-                          {Array.from({ length: 4 }, (_, i) => (
-                            <motion.div
-                              key={i}
-                              className={`absolute w-1 h-1 rounded-full bg-gradient-to-r ${card.gradient}`}
-                              style={{
-                                top: `${15 + i * 20}%`,
-                                right: `${10 + i * 15}%`,
-                              }}
-                              animate={{
-                                y: [0, -15, 0],
-                                opacity: [0.3, 1, 0.3],
-                                scale: [0.5, 1.2, 0.5]
-                              }}
-                              transition={{
-                                duration: 3 + i * 0.5,
-                                repeat: Infinity,
-                                delay: i * 0.8
-                              }}
-                            />
-                          ))}
-                </div>
-              </div>
-              </div>
-            </Card>
-                </motion.div>
-              )}
-
-              {/* Quick Stats */}
-              <Card className="bg-gradient-to-br from-zinc-900/80 to-zinc-800/60 backdrop-blur-xl border-zinc-700/50">
-                <div className="p-4">
-                  <h4 className="text-sm font-medium text-zinc-300 mb-3">Quick Stats</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-zinc-500">Max Value</span>
-                      <span className="text-sm font-medium text-white">${metrics.max.toFixed(0)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-zinc-500">Min Value</span>
-                      <span className="text-sm font-medium text-white">${metrics.min.toFixed(0)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-zinc-500">Data Points</span>
-                      <span className="text-sm font-medium text-white">{displayData.length}</span>
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
+                </motion.div>
+              ))
+
+              {/* Quick Stats */}
+            )}
+          </motion.div>
+
+          {/* Quick Stats Card - always visible */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
+            <Card className="bg-gradient-to-br from-zinc-900/80 to-zinc-800/60 backdrop-blur-xl border-zinc-700/50">
+              <div className="p-4">
+                <h4 className="text-sm font-medium text-zinc-300 mb-3">Quick Stats</h4>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-500">Max Value</span>
+                    <span className="text-sm font-medium text-white">${metrics.max.toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-500">Min Value</span>
+                    <span className="text-sm font-medium text-white">${metrics.min.toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-zinc-500">Data Points</span>
+                    <span className="text-sm font-medium text-white">{displayData.length}</span>
+                  </div>
+                </div>
               </div>
             </Card>
-            </motion.div>
           </motion.div>
         </motion.div>
       </main>

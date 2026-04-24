@@ -17,7 +17,7 @@ export function linearRegression(
   }
 
   const features = generateFeatures(data);
-  const regression = fitRegression(features, n);
+  const regression = fitRegression(features, data);
   
   const fitted: number[] = [];
   for (const row of features) {
@@ -122,9 +122,9 @@ function generateForecastFeatures(startIdx: number, periods: number): number[][]
   return features;
 }
 
-function fitRegression(features: number[][], n: number): RegressionResult {
+function fitRegression(features: number[][], data: number[]): RegressionResult {
   const X = new Matrix(features);
-  const y = Matrix.columnVector(features.map(row => row[0]));
+  const y = Matrix.columnVector(data);
 
   const Xt = X.transpose();
   const XtX = Xt.mmul(X);
