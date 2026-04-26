@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import {
   LayoutDashboard,
   LineChart,
@@ -8,7 +9,9 @@ import {
   Database,
   Settings,
   HelpCircle,
-  Sparkles
+  Sparkles,
+  LogOut,
+  User
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -29,6 +32,7 @@ const navItems: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <aside className="w-64 h-screen bg-gradient-to-b from-slate-900/95 via-purple-900/90 to-indigo-900/95 backdrop-blur-xl border-r border-slate-700/50 flex flex-col relative overflow-hidden">
@@ -247,6 +251,18 @@ export function Sidebar() {
       </nav>
       
       <div className="p-3 border-t border-zinc-800/50 space-y-1">
+        {session?.user && (
+          <div className="mb-2 px-3 py-2 bg-zinc-800/30 rounded-lg">
+            <div className="flex items-center gap-2 text-sm">
+              <User className="w-4 h-4 text-zinc-400" />
+              <span className="text-zinc-300 truncate">{session.user.name || session.user.email}</span>
+            </div>
+            <div className="text-xs text-zinc-500 mt-1 capitalize">
+              {session.user.role || 'User'}
+            </div>
+          </div>
+        )}
+
         <Link href="/settings">
           <motion.div
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 cursor-pointer ${
@@ -261,6 +277,17 @@ export function Sidebar() {
             Settings
           </motion.div>
         </Link>
+
+        <motion.div
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-all duration-200 hover:shadow-md cursor-pointer"
+          whileHover={{ x: 4 }}
+          transition={{ duration: 0.2 }}
+          onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
+        </motion.div>
+
         <motion.div
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-all duration-200 hover:shadow-md cursor-pointer"
           whileHover={{ x: 4 }}

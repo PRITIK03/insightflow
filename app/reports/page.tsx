@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { useInsightStore, useDataMetrics } from '@/lib/store';
+import { generateReportPDF } from '@/lib/pdf';
 import { Download, FileText, Calendar, Filter, Search, ChevronDown, ChevronUp, BarChart3, TrendingUp, TrendingDown } from 'lucide-react';
 import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
 
@@ -94,9 +95,8 @@ export default function ReportsPage() {
     window.URL.revokeObjectURL(url);
   };
 
-  const exportToPDF = () => {
-    // Simple PDF export simulation
-    alert('PDF export functionality would be implemented here with a library like jsPDF');
+  const exportToPDF = async () => {
+    await generateReportPDF(data, forecast, 'InsightFlow Report');
   };
 
   const toggleRowSelection = (index: number) => {
